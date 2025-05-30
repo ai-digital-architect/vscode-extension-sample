@@ -15,7 +15,11 @@ export class TestGenerator {
             const generatedTests = await this.createTestsForFiles(javaFiles);
             await this.writeTestFiles(generatedTests);
         } catch (error) {
-            throw new Error(`Failed to generate tests: ${error.message}`);
+            if (error instanceof Error) {
+                throw new Error(`Failed to generate tests: ${error.message}`);
+            } else {
+                throw new Error('Failed to generate tests: Unknown error');
+            }
         }
     }
 

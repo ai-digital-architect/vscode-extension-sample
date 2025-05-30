@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { exec, ExecException } from 'child_process';
 import * as vscode from 'vscode';
 
 /**
@@ -15,7 +15,10 @@ export class OpenRewriteService {
                 // Execute OpenRewrite via Maven/Gradle plugin
                 await this.executeRecipe(recipe);
             } catch (error) {
-                throw new Error(`Failed to apply recipe ${recipe}: ${error.message}`);
+                if (error instanceof Error) {
+                    throw new Error(`Failed to apply recipe ${recipe}: ${error.message}`);
+                }
+                throw new Error(`Failed to apply recipe ${recipe}: Unknown error`);
             }
         }
     }
@@ -24,10 +27,10 @@ export class OpenRewriteService {
      * Executes a single OpenRewrite recipe
      */
     private async executeRecipe(recipe: string): Promise<void> {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             const command = `./mvnw org.openrewrite.maven:rewrite-maven-plugin:run -Drewrite.recipeArtifactCoordinates=${recipe}`;
             
-            exec(command, (error, stdout, stderr) => {
+            exec(command, (error: ExecException | null, stdout: string, stderr: string) => {
                 if (error) {
                     reject(error);
                     return;

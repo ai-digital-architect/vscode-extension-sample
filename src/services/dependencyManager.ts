@@ -24,12 +24,12 @@ export class DependencyManager {
      * Updates dependencies in pom.xml
      */
     private async updateMavenDependencies(updates: DependencyUpdate[]): Promise<void> {
-        const pomPath = 'pom.xml';
-        if (!fs.existsSync(pomPath)) {
-            throw new Error('pom.xml not found');
-        }
-
         try {
+            const pomPath = 'pom.xml';
+            if (!fs.existsSync(pomPath)) {
+                throw new Error('pom.xml not found');
+            }
+
             // Parse pom.xml
             const pomContent = fs.readFileSync(pomPath, 'utf-8');
             const parser = new xml2js.Parser();
@@ -46,7 +46,8 @@ export class DependencyManager {
             fs.writeFileSync(pomPath, updatedPom);
 
         } catch (error) {
-            throw new Error(`Failed to update Maven dependencies: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`Failed to update Maven dependencies: ${errorMessage}`);
         }
     }
 
@@ -54,12 +55,12 @@ export class DependencyManager {
      * Updates dependencies in build.gradle
      */
     private async updateGradleDependencies(updates: DependencyUpdate[]): Promise<void> {
-        const gradlePath = fs.existsSync('build.gradle.kts') ? 'build.gradle.kts' : 'build.gradle';
-        if (!fs.existsSync(gradlePath)) {
-            throw new Error('Gradle build file not found');
-        }
-
         try {
+            const gradlePath = fs.existsSync('build.gradle.kts') ? 'build.gradle.kts' : 'build.gradle';
+            if (!fs.existsSync(gradlePath)) {
+                throw new Error('Gradle build file not found');
+            }
+
             let content = fs.readFileSync(gradlePath, 'utf-8');
             
             // Update each dependency in the Gradle file
@@ -76,7 +77,8 @@ export class DependencyManager {
             fs.writeFileSync(gradlePath, content);
 
         } catch (error) {
-            throw new Error(`Failed to update Gradle dependencies: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            throw new Error(`Failed to update Gradle dependencies: ${errorMessage}`);
         }
     }
 

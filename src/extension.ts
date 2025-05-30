@@ -1,4 +1,3 @@
-// Import required VS Code and Node.js modules
 import * as vscode from 'vscode';
 import { OpenRewriteService } from './services/openRewriteService';
 import { ProjectAnalyzer } from './services/projectAnalyzer';
@@ -6,6 +5,12 @@ import { UpgradePlanGenerator } from './services/upgradePlanGenerator';
 import { DependencyManager } from './services/dependencyManager';
 import { TestGenerator } from './services/testGenerator';
 import { CVEValidator } from './services/cveValidator';
+import type { UpgradePlan, DependencyUpdate, UpgradeResults } from './types/upgrade';
+
+// Service instances
+let openRewriteService: OpenRewriteService;
+let dependencyManagerService: DependencyManager;
+let cveValidatorService: CVEValidator;
 
 /**
  * This is the main activation event for the extension
@@ -15,10 +20,10 @@ export async function activate(context: vscode.ExtensionContext) {
     // Initialize core services
     const projectAnalyzer = new ProjectAnalyzer();
     const planGenerator = new UpgradePlanGenerator();
-    const openRewrite = new OpenRewriteService();
-    const dependencyManager = new DependencyManager();
+    openRewriteService = new OpenRewriteService();
+    dependencyManagerService = new DependencyManager();
     const testGenerator = new TestGenerator();
-    const cveValidator = new CVEValidator();
+    cveValidatorService = new CVEValidator();
 
     // Register commands that implement the extension's functionality
     let disposable = vscode.commands.registerCommand('java.upgrade.start', async () => {
@@ -42,7 +47,8 @@ export async function activate(context: vscode.ExtensionContext) {
             await validateResults();
 
         } catch (error) {
-            vscode.window.showErrorMessage(`Upgrade failed: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            vscode.window.showErrorMessage(`Upgrade failed: ${errorMessage}`);
         }
     });
 
@@ -66,14 +72,14 @@ async function executeUpgrade(plan: UpgradePlan): Promise<void> {
         location: vscode.ProgressLocation.Notification,
         title: "Upgrading Java Project",
         cancellable: true
-    }, async (progress, token) => {
+    }, async (progress) => {
         // 1. Apply OpenRewrite recipes
         progress.report({ message: 'Applying code transformations...' });
-        await openRewrite.applyRecipes(plan.recipes);
+        await openRewriteService.applyRecipes(plan.recipes);
 
         // 2. Update dependencies
         progress.report({ message: 'Updating dependencies...' });
-        await dependencyManager.updateDependencies(plan.dependencyUpdates);
+        await dependencyManagerService.updateDependencies(plan.dependencyUpdates);
 
         // 3. Fix build issues
         progress.report({ message: 'Fixing build issues...' });
@@ -85,7 +91,7 @@ async function executeUpgrade(plan: UpgradePlan): Promise<void> {
 
         // 5. Check for CVEs
         progress.report({ message: 'Checking for vulnerabilities...' });
-        await cveValidator.validate();
+        await cveValidatorService.validate();
     });
 }
 
@@ -93,10 +99,10 @@ async function executeUpgrade(plan: UpgradePlan): Promise<void> {
  * Validates the results of the upgrade
  */
 async function validateResults(): Promise<void> {
-    const results = {
+    const results: UpgradeResults = {
         buildSuccess: await checkBuild(),
         testsPassing: await checkTests(),
-        cveIssues: await cveValidator.getIssues(),
+        cveIssues: await cveValidatorService.getIssues(),
         changes: await getChangeSummary()
     };
 
@@ -116,7 +122,7 @@ async function showUpgradePlan(plan: UpgradePlan): Promise<boolean> {
         { enableScripts: true }
     );
 
-    panel.webview.html = generatePlanHtml(plan);
+    panel.webview.html = await generatePlanHtml(plan);
 
     // Wait for user confirmation
     return new Promise((resolve) => {
@@ -136,17 +142,60 @@ async function showUpgradePlan(plan: UpgradePlan): Promise<boolean> {
 // Export deactivate function
 export function deactivate() {}
 
-// Types and interfaces
-interface UpgradePlan {
-    recipes: string[];
-    dependencyUpdates: DependencyUpdate[];
-    javaVersion: string;
-    springBootVersion?: string;
+// Helper functions
+async function fixBuildIssues(): Promise<void> {
+    // Implementation will be added
 }
 
-interface DependencyUpdate {
-    groupId: string;
-    artifactId: string;
-    fromVersion: string;
-    toVersion: string;
+async function runTests(): Promise<void> {
+    // Implementation will be added
+}
+
+async function checkBuild(): Promise<boolean> {
+    // Implementation will be added
+    return true;
+}
+
+async function checkTests(): Promise<boolean> {
+    // Implementation will be added
+    return true;
+}
+
+async function getChangeSummary(): Promise<string[]> {
+    // Implementation will be added
+    return [];
+}
+
+async function generatePlanHtml(plan: UpgradePlan): Promise<string> {
+    // Implementation will be added
+    return `
+        <!DOCTYPE html>
+        <html>
+            <body>
+                <h1>Java Upgrade Plan</h1>
+                <pre>${JSON.stringify(plan, null, 2)}</pre>
+                <button onclick="approve()">Approve</button>
+                <button onclick="cancel()">Cancel</button>
+                <script>
+                    const vscode = acquireVsCodeApi();
+                    function approve() {
+                        vscode.postMessage({ command: 'approve' });
+                    }
+                    function cancel() {
+                        vscode.postMessage({ command: 'cancel' });
+                    }
+                </script>
+            </body>
+        </html>
+    `;
+}
+
+async function showUpgradeSummary(results: UpgradeResults): Promise<void> {
+    const message = `Upgrade Results:
+        Build: ${results.buildSuccess ? 'Success' : 'Failed'}
+        Tests: ${results.testsPassing ? 'Passing' : 'Failed'}
+        CVE Issues: ${results.cveIssues.length}
+        Changes: ${results.changes.length}`;
+    
+    await vscode.window.showInformationMessage(message);
 }

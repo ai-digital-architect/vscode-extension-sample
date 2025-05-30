@@ -41,14 +41,19 @@ export class CVEValidator {
                     }
                 });
 
-                if (response.data.vulnerabilities) {
+                const data = response.data as { vulnerabilities?: any[] };
+                if (data && data.vulnerabilities && Array.isArray(data.vulnerabilities)) {
                     issues.push({
                         dependency: dep,
-                        cves: response.data.vulnerabilities
+                        cves: data.vulnerabilities
                     });
                 }
             } catch (error) {
-                console.error(`Error checking CVEs for ${dep.groupId}:${dep.artifactId}`, error);
+                if (error instanceof Error) {
+                    console.error(`Error checking CVEs for ${dep.groupId}:${dep.artifactId}`, error.message);
+                } else {
+                    console.error(`Unknown error checking CVEs for ${dep.groupId}:${dep.artifactId}`);
+                }
             }
         }
 

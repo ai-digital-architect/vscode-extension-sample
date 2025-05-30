@@ -10,7 +10,7 @@ export class LoggingService {
 
     constructor() {
         this.outputChannel = vscode.window.createOutputChannel('Java Upgrade');
-        this.logLevel = LogLevel.Info;
+        this.logLevel = LogLevel.INFO;
     }
 
     /**
@@ -24,7 +24,7 @@ export class LoggingService {
      * Logs debug information
      */
     public debug(message: string, ...args: any[]): void {
-        if (this.logLevel <= LogLevel.Debug) {
+        if (this.logLevel <= LogLevel.DEBUG) {
             this.log('DEBUG', message, ...args);
         }
     }
@@ -33,7 +33,7 @@ export class LoggingService {
      * Logs general information
      */
     public info(message: string, ...args: any[]): void {
-        if (this.logLevel <= LogLevel.Info) {
+        if (this.logLevel <= LogLevel.INFO) {
             this.log('INFO', message, ...args);
         }
     }
@@ -42,7 +42,7 @@ export class LoggingService {
      * Logs warnings
      */
     public warn(message: string, ...args: any[]): void {
-        if (this.logLevel <= LogLevel.Warning) {
+        if (this.logLevel <= LogLevel.WARN) {
             this.log('WARN', message, ...args);
             vscode.window.showWarningMessage(this.formatMessage(message, args));
         }
@@ -52,7 +52,7 @@ export class LoggingService {
      * Logs errors
      */
     public error(message: string, error?: Error, ...args: any[]): void {
-        if (this.logLevel <= LogLevel.Error) {
+        if (this.logLevel <= LogLevel.ERROR) {
             this.log('ERROR', message, ...args);
             if (error) {
                 this.log('ERROR', error.stack || error.message);

@@ -82,8 +82,14 @@ export class DiagnosticService {
         this.diagnosticCollection.clear();
     }
 
+    public getDiagnostics(file: string): vscode.Diagnostic[] {
+        const diagnostics = this.diagnosticCollection.get(vscode.Uri.file(file));
+        return diagnostics ? [...diagnostics] : [];
+    }
+
     private getDiagnosticsForFile(file: string): vscode.Diagnostic[] {
-        return this.diagnosticCollection.get(vscode.Uri.file(file)) || [];
+        const diagnostics = this.diagnosticCollection.get(vscode.Uri.file(file));
+        return diagnostics ? Array.from(diagnostics) : [];
     }
 
     private getErrorRange(error: BuildError | CompatibilityIssue | DeprecatedApiUsage): vscode.Range {

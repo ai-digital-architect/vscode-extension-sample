@@ -122,7 +122,7 @@ export class GitService {
             const result = await execAsync(`git ${cmd}`, { cwd: this.workspaceRoot });
             return result;
         } catch (error: any) {
-            this.logger.error('Git command failed: git {0}', cmd, error);
+            this.logger.error('Git command failed: git {0}', error instanceof Error ? error : new Error(String(error)), cmd);
             throw new Error(`Git operation failed: ${error.message}`);
         }
     }

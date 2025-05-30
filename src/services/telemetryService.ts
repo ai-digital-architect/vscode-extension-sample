@@ -2,16 +2,49 @@ import * as vscode from 'vscode';
 import { LoggingService } from './loggingService';
 
 /**
+ * Custom implementation of TelemetrySender that uses VS Code's global state
+ */
+interface TelemetrySender {
+    sendEventData(eventName: string, data?: Record<string, any>): void;
+    sendErrorData(error: Error, data?: Record<string, any>): void;
+}
+
+class StateTelemetrySender implements TelemetrySender {
+    constructor(private readonly state: vscode.Memento) {}
+
+    sendEventData(eventName: string, data?: Record<string, any>): void {
+        const events = this.state.get<any[]>('telemetry-events', []);
+        events.push({ eventName, data, timestamp: new Date().toISOString() });
+        this.state.update('telemetry-events', events);
+    }
+
+    sendErrorData(error: Error, data?: Record<string, any>): void {
+        const errors = this.state.get<any[]>('telemetry-errors', []);
+        errors.push({
+            error: { 
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            },
+            data,
+            timestamp: new Date().toISOString()
+        });
+        this.state.update('telemetry-errors', errors);
+    }
+}
+
+/**
  * Service to handle telemetry events for the extension
  */
 export class TelemetryService {
-    private reporter: vscode.TelemetryLogger;
     private logger: LoggingService;
+    private reporter: vscode.TelemetryLogger;
     private isEnabled: boolean;
 
     constructor(logger: LoggingService, context: vscode.ExtensionContext) {
         this.logger = logger;
-        this.reporter = vscode.env.createTelemetryLogger(context.globalState);
+        const sender = new StateTelemetrySender(context.globalState);
+        this.reporter = vscode.env.createTelemetryLogger(sender);
         this.isEnabled = vscode.workspace.getConfiguration('telemetry').get('enableTelemetry', true);
     }
 
@@ -73,6 +106,48 @@ export class TelemetryService {
      */
     public dispose(): void {
         this.reporter.dispose();
+    }
+
+    /**
+     * Sends a custom event to the telemetry service.
+     * @param eventName - The name of the event.
+     * @param properties - Additional properties about the event.
+     */
+    public sendEvent(eventName: string, properties?: Record<string, string>): void {
+        if (!this.isEnabled) {
+            return;
+        }
+
+        try {
+            this.reporter.logUsage(eventName, properties);
+            this.logger.debug(`Telemetry event sent: ${eventName}`);
+        } catch (error) {
+            this.logger.error(
+                'Failed to send telemetry event',
+                error instanceof Error ? error : new Error('Unknown error')
+            );
+        }
+    }
+
+    /**
+     * Sends an error to the telemetry service.
+     * @param error - The error object.
+     * @param properties - Additional properties about the error.
+     */
+    public sendError(error: Error, properties?: Record<string, string>): void {
+        if (!this.isEnabled) {
+            return;
+        }
+
+        try {
+            this.reporter.logError(error);
+            this.logger.debug(`Telemetry error sent: ${error.message}`);
+        } catch (err) {
+            this.logger.error(
+                'Failed to send telemetry error',
+                err instanceof Error ? err : new Error('Unknown error')
+            );
+        }
     }
 }
 
