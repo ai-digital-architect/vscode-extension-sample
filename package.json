@@ -1,49 +1,539 @@
 {
-  "name": "vsc-ext-template",
-  "displayName": "vsc-ext-template",
-  "description": "Sample extension project",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.100.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "vsc-ext-template.helloWorld",
-        "title": "Hello World"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npm run check-types && npm run lint && node esbuild.js",
-    "watch": "npm-run-all -p watch:*",
-    "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && node esbuild.js --production",
-    "compile-tests": "tsc -p . --outDir out",
-    "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint src",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/vscode": "^1.100.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
-    "@typescript-eslint/eslint-plugin": "^8.31.1",
-    "@typescript-eslint/parser": "^8.31.1",
-    "eslint": "^9.25.1",
-    "esbuild": "^0.25.3",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.8.3",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.5.2"
-  }
+	"name": "vscode-java-upgrade",
+	"icon": "assets/JavaUpgrade_128x.png",
+	"publisher": "vscjava",
+	"preview": true,
+	"displayName": "GitHub Copilot app modernization - upgrade for Java",
+	"description": "Upgrade Java project with GitHub Copilot",
+	"version": "0.14.0",
+	"aiKey": "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255",
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-app-mod-pack"
+	},
+	"engines": {
+		"vscode": "^1.99.0"
+	},
+	"categories": [
+		"AI",
+		"Chat"
+	],
+	"tags": [
+		"java",
+		"upgrade",
+		"maven",
+		"gradle",
+		"spring boot",
+		"app modernization"
+	],
+	"extensionDependencies": [
+		"github.copilot-chat"
+	],
+	"devDependencies": {
+		"@types/vscode": "^1.99.0",
+		"@types/node": "^16.x",
+		"typescript": "^5.0.0"
+	},
+	"activationEvents": [
+		"onLanguage:java",
+		"workspaceContains:pom.xml",
+		"workspaceContains:**/pom.xml",
+		"workspaceContains:**/*.java"
+	],
+	"contributes": {
+		"commands": [
+			{
+				"command": "javaupgrade.gotoAgentMode",
+				"title": "Goto Agent mode",
+				"category": "app modernization - upgrade for Java"
+			},
+			{
+				"command": "javaupgrade.upgradeProject",
+				"title": "Upgrade Java Project",
+				"category": "app modernization - upgrade for Java"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "javaupgrade",
+					"title": "app modernization - upgrade for Java",
+					"icon": "assets/JavaUpgrade_24x.svg"
+				}
+			]
+		},
+		"views": {
+			"javaupgrade": [
+				{
+					"id": "javaupgradeEntry",
+					"name": "Upgrade Java Project",
+					"icon": "assets/JavaUpgrade_16x.svg",
+					"contextualTitle": "Upgrade Java Project"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "javaupgradeEntry",
+				"contents": "We are now part of Agent Mode!\nPlease open Copilot Chat, select Agent mode, and try \"upgrade this project to Java 21 and Spring Boot 3.2\". \n[Upgrade Java Project](command:javaupgrade.upgradeProject)"
+			}
+		],
+		"languageModelTools": [
+			{
+				"name": "javaupgrade_generate_plan",
+				"displayName": "Generate Upgrade Plan",
+				"userDescription": "Generate a plan to upgrade the Java project.",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_generate_plan",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool is specifically designed for upgrading Java projects. It generates a professional and efficient upgrade plan based on the current status of the project and the existing development environment, and will guide you step by step to complete the task of upgrading the Java project. It comes with a set of support tools to assist in the entire upgrade process.",
+				"tags": [
+					"java",
+					"java-upgrade",
+					"enable_other_tool_javaupgrade_confirm_plan",
+					"enable_other_tool_javaupgrade_openrewrite",
+					"enable_other_tool_javaupgrade_build_project",
+					"enable_other_tool_javaupgrade_build_fix",
+					"enable_other_tool_javaupgrade_summarize_fixes",
+					"enable_other_tool_javaupgrade_summarize_changes",
+					"enable_other_tool_javaupgrade_validate_cves",
+					"enable_other_tool_javaupgrade_validate_code_behavior_consistency"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"projectPath": {
+							"type": "string",
+							"description": "The path to the Java project to upgrade. Specify the root directory containing the project's build files. If not specified, should use the root directory of current workspace."
+						},
+						"sourceJdkPath": {
+							"type": "string",
+							"description": "The path to the source JDK version of the project. This should be a valid JDK path."
+						},
+						"targetJavaVersion": {
+							"type": "string",
+							"description": "The target Java version to upgrade to (e.g., 11, 17, 21). Must be a valid Java version number higher than the project's current version. This should match the value provided in the environment setup."
+						},
+						"targetJdkPath": {
+							"type": "string",
+							"description": "The path to the target JDK version to upgrade to. This should be a valid JDK path."
+						},
+						"targetSpringBootVersion": {
+							"type": "string",
+							"description": "The target Spring Boot version to upgrade to (e.g., 2.7.18, 3.2.12). Must be a valid Spring Boot version number higher than the project's current version."
+						},
+						"buildToolPath": {
+							"type": "string",
+							"description": "The path to the build tool(eg Maven, Gradle) executable.This should be a valid path."
+						}
+					}
+				}
+			},
+			{
+				"name": "javaupgrade_confirm_plan",
+				"displayName": "Review Plan",
+				"userDescription": "Review the generated upgrade plan.",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_confirm_plan",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool displays the plan generated by the `javaupgrade_generate_plan` tool in the editor area, and allows users to make corresponding adjustments to the plan and confirm before execution. You should invoke this tool immediately after the plan is generated to ask user to confirm.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The session ID of the plan to confirm. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						}
+					},
+					"required": [
+						"sessionId"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_openrewrite",
+				"displayName": "Upgrade Using OpenRewrite",
+				"userDescription": "Upgrade the Java project using OpenRewrite",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_openrewrite",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool is specifically designed for upgrading Java projects and it is based on the open-source program, OpenRewrite. All you need is to provide the upgrade goals, it will automatically discover and select the suitable OpenRewrite recipes to apply based on the current status of the project. WARNING: it can only be invoked once during an upgrade process.",
+				"tags": [
+					"java",
+					"java-upgrade",
+					"openrewrite"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						}
+					},
+					"required": [
+						"sessionId"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_build_project",
+				"displayName": "Build Project",
+				"userDescription": "Build the Java project to validate the upgrade",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_build_project",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool uses Maven or Gradle to build your project and report any detected errors. You should use this tool to verify the upgrade status after making code changes, and fix any errors found.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						}
+					},
+					"required": [
+						"sessionId"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_build_fix",
+				"displayName": "Build & Fix",
+				"userDescription": "Build the Java project and fix any build errors",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_build_fix",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool builds the Java project after upgrade changes have been applied, capturing any compilation errors that need to be fixed. It executes the appropriate build commands using the specified build tool (Maven or Gradle) while targeting the desired Java version. Use this tool when you need to validate if the current code changes compile successfully or to get a comprehensive list of remaining issues to fix. It will return 'Project built successfully' if the build is successful, or a list of compilation errors if there are any issues.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						}
+					},
+					"required": [
+						"sessionId"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_human_fix",
+				"displayName": "Fix Errors Manually",
+				"userDescription": "Fix build errors manually",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_human_fix",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool asks user to help fix errors. It will display the errors, and allow users to make corresponding adjustments to the code. You should invoke this tool when you are unable to fix the errors automatically after several attempts.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						},
+						"errors": {
+							"type": "array",
+							"description": "list of errors that need user to fix manually.",
+							"items": {
+								"type": "object",
+								"description": "The error details",
+								"properties": {
+									"errorMessage": {
+										"type": "string",
+										"description": "The error message or description of the issue encountered. This should be a clear and concise representation of the error."
+									},
+									"raw": {
+										"type": "string",
+										"description": "The raw error (stack) of the issue encountered"
+									},
+									"filePath": {
+										"type": "string",
+										"description": "The path to the file where the error occurred. This should be a valid file path."
+									},
+									"lineNumber": {
+										"type": "integer",
+										"description": "The line number where the error occurred. This should be a valid line number."
+									}
+								},
+								"required": [
+									"errorMessage",
+									"raw",
+									"filePath"
+								]
+							}
+						}
+					},
+					"required": [
+						"sessionId",
+						"errors"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_validate_cves",
+				"displayName": "Check CVEs",
+				"userDescription": "Check if the given dependencies have any known vulnerabilities (CVEs)",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_validate_cves",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tools checks if the given dependencies have any known vulnerabilities (CVEs). You MUST! use this tool to validate ALL the updated/added maven dependencies.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						},
+						"coordinates": {
+							"type": "array",
+							"description": "the coordinates of the dependencies to check for vulnerabilities. Each coordinate should be in the format of `groupId:artifactId:version`.",
+							"examples": [
+								"org.springframework:spring-core:5.3.9",
+								"org.apache.commons:commons-lang3:3.12.0"
+							],
+							"items": {
+								"type": "string",
+								"description": "The coordinate of a dependency to check for vulnerabilities, in the format of `groupId:artifactId:version`."
+							}
+						}
+					},
+					"required": [
+						"sessionId",
+						"coordinates"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_validate_code_behavior_consistency",
+				"displayName": "Check Code Behavior Changes",
+				"userDescription": "Check if logic behavior of modified code remains the same as before the upgrade",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_validate_code_behavior_consistency",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "Validate the behavior of upgraded Java code to ensure it maintains the same logic functionality as before the upgrade. This tool analyzes and compares the behavior of modified code before and after upgrading using LLM. It checks for any discrepancies in output, performance, or error handling compared to the original version. This tool should be called after each time you modify the code or, to save time, after you complete the upgrade process.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						},
+						"projectPath": {
+							"type": "string",
+							"description": "The path to the Java project to upgrade. Specify the root directory containing the project's build files. If not specified, should use the root directory of current workspace."
+						}
+					},
+					"required": [
+						"sessionId",
+						"projectPath"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_run_tests",
+				"displayName": "Run Tests",
+				"userDescription": "Run the tests in the Java project to validate the upgrade",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_run_tests",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool runs the tests in the Java project and reports any detected errors or test failures. You should use this tool to verify the upgrade status after making code changes.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						}
+					},
+					"required": [
+						"sessionId"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_summarize_fixes",
+				"displayName": "Summarize Fixes",
+				"userDescription": "Summarize the code changes made to fix issues and commit them",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_summarize_fixes",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool tracks the code changes you made to fix any issues (e.g. CVE issues, behavior changes, test failures) during the upgrade process. You should call this tool after fixing any issues/errors successfully",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						},
+						"message": {
+							"type": "string",
+							"description": "The short description of the code changes made, this will also be used a commit message of the code changes, so it should be a short summary of the changes made with only one sentence. e.g. 'Fix CVE-2023-1234 in org.springframework:spring-core:5.3.9'."
+						},
+						"details": {
+							"type": "string",
+							"description": "a markdown formatted detailed description of the code changes made. This should be a 2-level bullet list, with the first level being the short description of the issue fixed and the second level being the summarised description of the changes made to fix the issue. e.g. '- Fix CVE-2023-1234 in `org.springframework:spring-core`\n  - Upgrade `org.springframework:spring-core` to `x.y.z`'."
+						}
+					},
+					"required": [
+						"sessionId",
+						"message",
+						"details"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_summarize_upgrade",
+				"displayName": "Summarize Upgrade",
+				"userDescription": "Summarize all the changes made to upgrade the Java project",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_summarize_upgrade",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "You MUST! call this tool after the upgrade session completes. This tool summarize all the changes made during the the upgrade **automatically**, it will ultimately persist them into a markdown file for recording or sharing.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"sessionId": {
+							"type": "string",
+							"description": "The id of the upgrade session. This should be the same as the session ID generated by the `javaupgrade_generate_plan` tool."
+						}
+					},
+					"required": [
+						"sessionId"
+					]
+				}
+			},
+			{
+				"name": "javaupgrade_generate_tests",
+				"displayName": "Generate Unit Tests",
+				"userDescription": "Generate unit tests for the Java project",
+				"icon": "assets/JavaUpgrade_16x.svg",
+				"toolReferenceName": "javaupgrade_generate_tests",
+				"canBeReferencedInPrompt": true,
+				"modelDescription": "This tool generates test cases for a specified Java project by automatically detecting all source java files and creating corresponding test java files. Only the high quality test cases are retained.",
+				"tags": [
+					"java",
+					"java-upgrade"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"projectPath": {
+							"type": "string",
+							"description": "The path to the Java project to generate tests. Specify the root directory containing the project's build files. If not specified, should use the root directory of current workspace."
+						}
+					},
+					"required": [
+						"projectPath"
+					]
+				}
+			}
+		]
+	},
+	"main": "./dist/extension.js",
+	"scripts": {
+		"update-version": "npx tsx ./scripts/updateVersion.ts",
+		"validate:patches": "npx tsx ./scripts/validatePatches.ts",
+		"clean": "npx rimraf out && npx rimraf dist",
+		"lint": "eslint \"src/**/*.{js,ts,jsx,tsx}\" --max-warnings=0",
+		"lint:fix:prettier": "prettier --write \"src/**/*.{js,ts,jsx,tsx,css,scss}\"",
+		"lint:fix:eslint": "eslint \"src/**/*.{js,ts,jsx,tsx}\" --fix",
+		"watch:esbuild": "node esbuild.js --watch",
+		"watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+		"compile-tests": "tsc -p . --outDir out",
+		"compile": "tsc --noEmit && npm run lint && node esbuild.js",
+		"build": "tsc --noEmit && npm run lint && node esbuild.js --production",
+		"vscode:prepublish": "npm run clean && npm run build",
+		"package": "vsce package",
+		"auth:feed": "npx vsts-npm-auth -config .npmrc -F"
+	},
+	"devDependencies": {
+		"@types/diff": "^7.0.2",
+		"@types/express": "^5.0.1",
+		"@types/js-yaml": "^4.0.9",
+		"@types/node": "^20.16.5",
+		"@types/semver": "^7.5.8",
+		"@types/vscode": "^1.99.1",
+		"@types/xml2js": "^0.4.14",
+		"@typescript-eslint/eslint-plugin": "^7.18.0",
+		"@typescript-eslint/parser": "^7.18.0",
+		"@vscode/vsce": "^3.3.2",
+		"async-mutex": "^0.5.0",
+		"esbuild": "^0.25.3",
+		"eslint": "^8.57.1",
+		"eslint-config-prettier": "^10.1.2",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-prettier": "^5.2.6",
+		"npm-run-all": "^4.1.5",
+		"prettier": "^3.5.3",
+		"rimraf": "^6.0.1",
+		"ts-loader": "^9.5.2",
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"@azure/identity": "^4.8.0",
+		"@microsoft/deepprompt-kb-sdk": "^0.14.0",
+		"@modelcontextprotocol/sdk": "^1.7.0",
+		"@octokit/rest": "^21.1.1",
+		"@vscode/chat-extension-utils": "^0.0.0-alpha.1",
+		"@vscode/extension-telemetry": "^0.9.8",
+		"@vscode/tree-sitter-wasm": "^0.0.5",
+		"@xmldom/xmldom": "^0.9.8",
+		"csv-parse": "^5.6.0",
+		"diff": "^7.0.0",
+		"express": "^5.1.0",
+		"fast-xml-parser": "^5.2.1",
+		"glob": "^11.0.2",
+		"jdk-utils": "^0.5.1",
+		"js-tiktoken": "^1.0.20",
+		"js-yaml": "^4.1.0",
+		"openai": "^4.94.0",
+		"rxjs": "^7.8.2",
+		"semver": "^7.7.1",
+		"web-tree-sitter": "^0.23.0",
+		"string-argv": "^0.3.2",
+		"xml2js": "^0.6.2",
+		"zod": "^3.24.2"
+	},
+	"__metadata": {
+		"installedTimestamp": 1747920842331,
+		"targetPlatform": "undefined",
+		"size": 9450431
+	}
 }

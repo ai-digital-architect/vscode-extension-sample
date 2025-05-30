@@ -1,71 +1,65 @@
-# vsc-ext-template README
+# GitHub Copilot app modernization - upgrade for Java
 
-This is the README for your extension "vsc-ext-template". After writing up a brief description, we recommend including the following sections.
+**GitHub Copilot app modernization - upgrade for Java** helps you upgrade your Java applications. It's an extension for Visual Studio Code which can help:
 
-## Features
+- Analyze your project, assess your dependencies and propose an upgrade plan
+- Execute the plan to transform your project
+- Automatically fix issues during the progress
+- Report all details including commits, logs and output
+- Show a summary including file changes, updated dependencies and commits in the working branch when update is finished
+- Generate unit test cases separately from the upgrade process.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## How to use
 
-For example if there is an image subfolder under your extension project workspace:
+- [Overview/Quickstart](https://aka.ms/java-upgrade-docs)
+- [FAQ](https://aka.ms/ghcp-appmod/java-upgrade-faq)
 
-\!\[feature X\]\(images/feature-x.png\)
+## Key Capabitlies
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### 🔍 Intelligent Analysis and Upgrade Planning
 
-## Requirements
+Modernization starts with understanding your code. The extension automatically analyzes your Java code and generates a customizable upgrade plan that you can review and edit within VS Code.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+![Plan](https://raw.githubusercontent.com/microsoft/vscode-java-pack/refs/heads/java-upgrade/docs/plan.png)
 
-## Extension Settings
+### 🔧 Automatic Code Transformation and Error Fixing
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Modernization isn’t complete until your application builds successfully. GitHub Copilot app modernization - upgrade for Java executes tools like open-source tools like [OpenRewrite](https://docs.openrewrite.org/) to apply code transformations, automatically resolve build issues, and run test validations — ensuring a smooth, error-free upgrade process.
 
-For example:
+![Build and Fix](https://raw.githubusercontent.com/microsoft/vscode-java-pack/refs/heads/java-upgrade/docs/buildfix.png)
 
-This extension contributes the following settings:
+### 🛡️ Post-Upgrade CVE Validation
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+After the upgrade process is completed, the tool scans for CVE (Common Vulnerabilities and Exposures) issues and code inconsistencies. When such issues are detected, it automatically applies fixes within VS Code Agent Mode, allowing the user to review the changes. This enhances the application's security posture and ensures compliance with organizational guidelines.
 
-## Known Issues
+![CVE Check](https://raw.githubusercontent.com/microsoft/vscode-java-pack/refs/heads/java-upgrade/docs/cve.png)
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+### 🔄 Summarizing the Upgrade Process
 
-## Release Notes
+The summary at the end of upgrade provides you with an overview of key details, including file changes, updated dependencies, test validation results and remaining minor issues.
 
-Users appreciate release notes as you update your extension.
+![Summary](https://raw.githubusercontent.com/microsoft/vscode-java-pack/refs/heads/java-upgrade/docs/summary.png)
 
-### 1.0.0
+### 🧪 Unit Test Generation
 
-Initial release of ...
+In addition to Java upgrade, GitHub Copilot app modernization - upgrade for Java can also help generate unit test cases separately to boost the unit test coverage.
 
-### 1.0.1
+## Feedback
 
-Fixed issue #.
+We value your feedback — share [your thoughts here](https://aka.ms/AM4JFeedback) to help us continue improving the product.
 
-### 1.1.0
+## License
 
-Added features X, Y, and Z.
+This extension is licensed under [GitHub Copilot Product Specifc Terms](https://github.com/customer-terms/github-copilot-product-specific-terms).
 
----
+## Telemetry
 
-## Following extension guidelines
+VS Code collects usage data and sends it to Microsoft to help improve our products and services. Read our [privacy statement](https://go.microsoft.com/fwlink/?LinkId=521839) to learn more. If you don’t wish to send usage data to Microsoft, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more in our [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+## Trademarks
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
+trademarks or logos is subject to and must follow
+[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
+Any use of third-party trademarks or logos are subject to those third-party's policies.
