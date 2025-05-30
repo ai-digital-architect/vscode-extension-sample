@@ -1,51 +1,66 @@
+---
+title: Project Architecture & Workflows
+icon: 🛠️
+description: Structure, patterns, and best practices for the Java upgrade VS Code extension.
+---
 
+# 🛠️ Project Structure & Key Workflows
 
 This is a clean, well-structured version of how the extension works. Here's what each part does:
 
-extension.ts - Main entry point that:
+- **`src/extension.ts`** – Main entry point that:
+  - 🟢 Registers VS Code commands
+  - 🔄 Orchestrates the upgrade process
+  - 👤 Handles user interaction
+  - 🧩 Manages the overall workflow
+- **`src/services/openRewriteService.ts`** – Handles code transformations:
+  - 🧬 Integrates with OpenRewrite
+  - 📝 Applies transformation recipes
+  - ⚙️ Manages the execution of code changes
+- **`src/services/projectAnalyzer.ts`** – Analyzes the project:
+  - 🏗️ Detects build system (Maven/Gradle)
+  - 📦 Analyzes dependencies
+  - 🏷️ Determines Java and Spring versions
+  - 🗂️ Provides project structure information
+- **`src/services/cveValidator.ts`** – Handles security validation:
+  - 🛡️ Checks for known vulnerabilities
+  - 🌐 Integrates with NVD database
+  - 🚨 Reports security issues
+  - 🛠️ Suggests fixes
 
-Registers VS Code commands
-Orchestrates the upgrade process
-Handles user interaction
-Manages the overall workflow
-openRewriteService.ts - Handles code transformations:
+## 🔄 Key Workflows
 
-Integrates with OpenRewrite
-Applies transformation recipes
-Manages the execution of code changes
-projectAnalyzer.ts - Analyzes the project:
+### 1. Analysis & Planning
+- Scans project structure
+- Determines current versions
+- Creates upgrade plan
 
-Detects build system (Maven/Gradle)
-Analyzes dependencies
-Determines Java and Spring versions
-Provides project structure information
-cveValidator.ts - Handles security validation:
+### 2. Transformation
+- Applies OpenRewrite recipes
+- Updates dependencies
+- Transforms code
 
-Checks for known vulnerabilities
-Integrates with NVD database
-Reports security issues
-Suggests fixes
+### 3. Validation
+- Runs builds
+- Executes tests
+- Checks for CVEs
+- Reports issues
 
-The extension follows these key workflows:
+### 4. Reporting
+- Generates summary
+- Shows changes
+- Reports errors
 
-Analysis & Planning:
+---
 
-Scans project structure
-Determines current versions
-Creates upgrade plan
-Transformation:
+## 🤖 GitHub Copilot & TypeScript Best Practices
+- Use dependency injection for all services (`src/services/*.ts`)
+- Use custom error types for domain-specific errors
+- Use async/await and handle errors with try/catch
+- Dispose of all VS Code resources
+- Document all public classes and methods
+- Use globs in documentation for code references (e.g., `src/services/*.ts`)
 
-Applies OpenRewrite recipes
-Updates dependencies
-Transforms code
-Validation:
+---
 
-Runs builds
-Executes tests
-Checks for CVEs
-Reports issues
-Reporting:
-
-Generates summary
-Shows changes
-Reports errors
+For more, see [`github-copilot-instructions.md`](./github-copilot-instructions.md) and [`README.md`](./README.md).
